@@ -1,0 +1,157 @@
+/* Reset styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styles */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Header styles */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+header h1 {
+    font-size: 24px;
+}
+
+/* Navigation styles */
+nav ul {
+    list-style: none;
+}
+
+nav ul li {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+/* Container styles */
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+}
+
+/* Section styles */
+section {
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 20px;
+}
+
+/* Form styles */
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #555;
+}
+
+/* Footer styles */
+footer {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+
+footer p {
+    font-size: 14px;
+}
+.events {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-dashboard {
+    background-color: #f4f4f4;
+    padding: 20px 0;
+}
+
+.summary-cards {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.card {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    width: calc(33.33% - 40px);
+}
+
+.card h3 {
+    margin-top: 0;
+}
+
+.card p {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.card a {
+    display: block;
+    background-color: #333;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin: 0 auto;
+    width: 50%;
+}
+
+.card a:hover {
+    background-color: #555;
+}
+
+.d-flex {
+    display: flex;
+    flex-wrap: wrap;
+}
+.w-1\/3 {
+    width: 33.333333%;
+  }
+  
+  .w-2\/3 {
+    width: 66.666667%;
+  }
+  .vertical-line {
+    padding: 3px;
+    border-right: 1px solid black; /* Change color and thickness as needed */
+    height: 100%; /* Adjust height as needed */
+  }
