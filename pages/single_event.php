@@ -11,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit();
 }
-
 // Check if event ID is provided in the URL
 if (!isset($_GET['event_id']) || !is_numeric($_GET['event_id'])) {
     // Redirect to events page if event ID is not provided or invalid
@@ -38,40 +37,110 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header("Location: {$_SERVER['REQUEST_URI']}");
     exit();
 }
+
+$message = '';
+
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $event['event_name']; ?> - Developer Events</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Add your custom CSS styles for the success message box */
+        .message {
+            position: absolute;
+            margin: 25px;
+            right: 0;
+            top: 0;
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .comment-list {
+            max-height: 200px;
+            /* Set a maximum height for the comments section */
+            overflow-y: auto;
+            padding: 5px;
+            /* Enable vertical scrolling if content overflows */
+        }
+
+        .comment {
+            padding: 5px;
+        }
+
+        /* Alternating row colors */
+        .comment:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+
+        .event-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .event-description {
+            padding: 10px 0 5px 0;
+
+        }
+    </style>
 </head>
+
 <body>
-    <header>
-        <h1>Developer Events</h1>
-        <nav>
-            <ul>
-                <li><a href="events.php">View Events</a></li>
-                <li><a href="about_us.php">About Us</a></li>
-                <li><a href="feedback.php">Feedback</a></li>
-                <li><a href="../auth/logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+    <?php
+    include "./header.php";
+    ?>
     <section class="single-event">
-        <div class="container">
-            <h2><?php echo $event['event_name']; ?></h2>
-            <img src="../assets/images/<?php echo $event['event_image']; ?>" width="300" alt="<?php echo $event['event_name']; ?>">
-            <p><?php echo $event['event_description']; ?></p>
-            <p><strong>Date & Time:</strong> <?php echo date('M d, Y H:i', strtotime($event['event_date'])); ?></p>
-            <p><strong>Location:</strong> <?php echo $event['event_location']; ?></p>
-            <?php if (!empty($event['event_external_link'])): ?>
-                <p><strong>External Link:</strong> <a href="<?php echo $event['event_external_link']; ?>" target="_blank">Visit Website</a></p>
-            <?php endif; ?>
+        <div class="container event-container">
+            <div>
+                <h2><?php echo $event['event_name']; ?></h2>
+                <img src="../assets/images/<?php echo $event['event_image']; ?>" width="500" class="object-cover" alt="<?php echo $event['event_name']; ?>">
+                <p class="event-description"><?php echo $event['event_description']; ?></p>
+                <p><strong>From:</strong> <?php echo date('M d, Y H:i', strtotime($event['event_from'])); ?></p>
+                <p><strong>To:</strong> <?php echo date('M d, Y H:i', strtotime($event['event_to'])); ?></p>
+                <p><strong>Location:</strong> <?php echo $event['event_location']; ?></p>
+                <?php if (!empty($event['event_external_link'])) : ?>
+                    <p><strong>External Link:</strong> <a href="<?php echo $event['event_external_link']; ?>" target="_blank">Visit Website</a></p>
+                <?php else : ?>
+                    <p><strong>External Link:</strong>Link Not Availabe</p>
+                <?php endif; ?>
+            </div>
+
+            <!-- Booking form -->
+            <div id="book-event">
+                <?php
+                if (isset($_GET['message'])) {
+                    $message = $_GET['message'];
+                    echo "<p class='message'>" . $message . "</p>";
+                }
+                ?>
+                <h2 style="margin-top: 10px;">Register For Event</h2>
+                <form action="book_event.php" method="POST" onsubmit="return confirm('Are you sure you want to register for this event?')">
+                    <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" value="<?php echo $_SESSION['username']; ?>" readonly required><br><br>
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required><br><br>
+                    <label for="current_location">Current Location/Institution:</label>
+                    <input type="text" id="current_location" name="current_location" required><br><br>
+                    <label for="email">Phone Number(Optional):</label>
+                    <input type="text" id="phone_number" name="phone_number" required><br><br>
+                    <!-- Add additional fields relevant to event registration here -->
+                    <button type="submit">Book Event</button>
+                </form>
+            </div>
         </div>
     </section>
+
     <section class="comments">
         <div class="container">
             <h3>Comments</h3>
@@ -80,23 +149,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit">Submit</button>
             </form>
             <div class="comment-list">
-                <?php if($comments): ?>
-                    <?php foreach($comments as $comment): ?>
+                <?php if ($comments) : ?>
+                    <?php foreach ($comments as $key => $comment) : ?>
                         <div class="comment">
                             <p><strong><?php echo get_username_by_id($comment['user_id']); ?>:</strong> <?php echo $comment['comment']; ?></p>
                             <small><?php echo date('M d, Y H:i', strtotime($comment['created_at'])); ?></small>
                         </div>
+                        <!-- Add a line break after the fifth comment -->
+                        <?php if ($key === 4) break; ?>
                     <?php endforeach; ?>
-                <?php else: ?>
+                <?php else : ?>
                     <p>No comments yet.</p>
                 <?php endif; ?>
             </div>
         </div>
     </section>
-    <footer>
-        <div class="container">
-            <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
-        </div>
-    </footer>
+    <?php
+    include "./footer.php";
+    ?>
+    <script>
+        // Automatically hide the success message after 5 seconds
+        setTimeout(function() {
+            document.querySelector('.message').style.display = 'none';
+        }, 5000);
+    </script>
 </body>
+
 </html>

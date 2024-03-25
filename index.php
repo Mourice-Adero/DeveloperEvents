@@ -7,9 +7,9 @@ require_once 'includes/functions.php';
 session_start();
 
 // Check if user is logged in
-if(isset($_SESSION['user_id'])) {
+if (isset($_SESSION['user_id'])) {
     // User is logged in, redirect to events page
-    header('Location: pages/events.php');
+    header('Location: pages/index.php');
     exit();
 }
 
@@ -34,4 +34,3 @@ if (isset($_GET['page'])) {
     // Default page to display if no specific page is requested
     header('location: pages/index.php');
 }
-?>

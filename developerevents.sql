@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 28, 2024 at 10:45 PM
+-- Generation Time: Mar 25, 2024 at 01:02 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -78,9 +78,7 @@ CREATE TABLE `comments` (
 --
 
 INSERT INTO `comments` (`comment_id`, `event_id`, `user_id`, `comment`, `created_at`) VALUES
-(1, 5, 1, 'Cant wait to attend', '2024-02-28 18:17:17'),
-(2, 18, 1, 'Test commnet', '2024-02-28 20:06:10'),
-(3, 18, 2, 'I like it', '2024-02-28 20:07:58');
+(9, 21, 5, 'I can\'t wait to attend!', '2024-03-25 10:24:58');
 
 -- --------------------------------------------------------
 
@@ -91,8 +89,9 @@ INSERT INTO `comments` (`comment_id`, `event_id`, `user_id`, `comment`, `created
 CREATE TABLE `events` (
   `event_id` int(11) NOT NULL,
   `event_name` varchar(100) NOT NULL,
+  `event_from` datetime DEFAULT NULL,
+  `event_to` datetime DEFAULT NULL,
   `event_description` text NOT NULL,
-  `event_date` datetime NOT NULL,
   `event_location` varchar(100) NOT NULL,
   `event_image` varchar(255) DEFAULT NULL,
   `event_external_link` varchar(255) DEFAULT NULL,
@@ -103,24 +102,35 @@ CREATE TABLE `events` (
 -- Dumping data for table `events`
 --
 
-INSERT INTO `events` (`event_id`, `event_name`, `event_description`, `event_date`, `event_location`, `event_image`, `event_external_link`, `category_id`) VALUES
-(1, 'Web Development', 'Learn the latest trends in web development.', '2024-03-15 10:00:00', 'New York, USA', NULL, NULL, NULL),
-(2, 'Data Science Summit', 'Join experts to explore the world of data science.', '2024-04-20 09:30:00', 'San Francisco, CA', NULL, NULL, NULL),
-(3, 'Mobile App Workshop', 'Hands-on workshop for building mobile apps.', '2024-03-25 11:00:00', 'London, UK', NULL, NULL, NULL),
-(4, 'AI Conference', 'Discover the future of artificial intelligence.', '2024-05-10 09:00:00', 'Berlin, Germany', NULL, NULL, NULL),
-(5, 'Hackathon', 'Compete with others to build innovative solutions.', '2024-04-05 08:00:00', 'Sydney, Australia', NULL, NULL, NULL),
-(6, 'Tech Talk Series', 'Engage in insightful discussions on tech topics.', '2024-03-30 13:00:00', 'Tokyo, Japan', NULL, NULL, NULL),
-(7, 'Cybersecurity Forum', 'Learn about the latest cybersecurity threats.', '2024-04-15 10:30:00', 'Washington, D.C.', NULL, NULL, NULL),
-(8, 'Cloud Computing Expo', 'Explore advancements in cloud computing.', '2024-05-05 09:00:00', 'Paris, France', NULL, NULL, NULL),
-(9, 'Blockchain Seminar', 'Dive into the world of blockchain technology.', '2024-03-20 14:00:00', 'Toronto, Canada', NULL, NULL, NULL),
-(10, 'IoT Workshop', 'Learn to build IoT applications from scratch.', '2024-04-10 10:00:00', 'Mumbai, India', NULL, NULL, NULL),
-(11, 'UX/UI Design Conference', 'Explore UX/UI design principles and best practices.', '2024-05-15 09:30:00', 'Barcelona, Spain', NULL, NULL, NULL),
-(12, 'DevOps Summit', 'Discover the latest DevOps methodologies.', '2024-03-18 08:30:00', 'Melbourne, Australia', NULL, NULL, NULL),
-(13, 'Big Data Symposium', 'Dive deep into big data analytics and technologies.', '2024-04-22 10:00:00', 'Seoul, South Korea', 'bds.jpg', 'https://bigdatasymposium.dsigroup.org/', 2),
-(14, 'Software Engineering Forum', 'Discuss software engineering concepts and methodologies.', '2024-03-28 11:00:00', 'Sao Paulo, Brazil', NULL, NULL, NULL),
-(15, 'Product Management Workshop', 'Learn product management strategies and techniques.', '2024-05-08 13:00:00', 'Amsterdam, Netherlands', NULL, NULL, NULL),
-(18, 'Test event', 'Testing 131', '2024-02-12 12:11:00', 'Nakuru Kenya', 'snap6.jpg', NULL, 3),
-(19, 'Test Event Two', 'TWo', '2024-08-08 17:06:00', 'Nairobi, Kenya', 'ERDImage.jpg', 'https://microcontrollerslab.com/embedded-systems-medical-applications/', 2);
+INSERT INTO `events` (`event_id`, `event_name`, `event_from`, `event_to`, `event_description`, `event_location`, `event_image`, `event_external_link`, `category_id`) VALUES
+(21, 'TEMs AFRICA ICT Expo 2024', '2024-04-25 08:00:00', '2024-04-26 16:00:00', '\"The Largest ICT Show in East Africa\"\r\nTEMS Africa ICT Expo is the world\'s gathering place for all those who thrive on the business of consumer technologies. It has served as the proving ground for innovators and breakthrough technologies on the global stage where next-generation innovations are introduced to the marketplace. Pioneered in Kenya by one of our very own it attracts the world\'s business leaders and pioneering thinkers.', 'The Sarit Expo Centre, Nairobi, Kenya 1', 'TEMS-LOGO-1536x519.png', 'https://10times.com/tems-ict-expo', 2),
+(22, 'Retail Tech Show 2024', '2024-06-19 06:00:00', '2024-06-26 23:59:00', 'he best way to optimize the supply chain is to apply the digital transformation. Business platform presenting retail digital transformation and trends based on convergent technologies gathering retail tech leaders worldwide.', 'COEX Convention Center, Seoul, South Korea', 'retail-tech-show.png', 'https://www.retailtechnologyshow.com/', 2),
+(23, 'Connected Africa Summit 2024', '2024-04-21 11:01:00', '2024-04-22 12:00:00', 'Join The Summit, where industry leaders, officials, and innovators unite to drive collaboration and growth. Shape Africa\'s digital future, contribute to transformative initiatives and unlock new possibilities for innovation and development. Forge a path for growth, connectivity, and innovation through strategic outcomes such as developing a Digital Inclusion Charter, securing economic commitments, creating a powerful investment nexus, establishing a blueprint for smart governance, facilitating digital trade, and promoting efficient transactions. Experience plenary sessions, breakout sessions, pavilions showcasing innovation, meetings exploring digital solutions, and an awards ceremony honoring digital excellence. Networking sessions provide valuable connections and engagement opportunities.', 'Nairobi, Kenya', 'connected africa summit.jpg', 'https://www.connected.go.ke/', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_bookings`
+--
+
+CREATE TABLE `event_bookings` (
+  `booking_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `current_location` varchar(255) DEFAULT NULL,
+  `phone_number` varchar(15) DEFAULT NULL,
+  `booking_time` timestamp NOT NULL DEFAULT current_timestamp(),
+  `cancellation_status` tinyint(1) DEFAULT 0,
+  `confirmation_status` tinyint(1) DEFAULT 0,
+  `booking_date` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `event_bookings`
+--
+
+INSERT INTO `event_bookings` (`booking_id`, `event_id`, `user_id`, `current_location`, `phone_number`, `booking_time`, `cancellation_status`, `confirmation_status`, `booking_date`) VALUES
+(29, 21, 5, 'Nakuru', '0712345678', '2024-03-25 10:19:07', 1, 0, '2024-03-25 10:19:07');
 
 -- --------------------------------------------------------
 
@@ -140,9 +150,7 @@ CREATE TABLE `feedbacks` (
 --
 
 INSERT INTO `feedbacks` (`feedback_id`, `user_id`, `feedback_date`, `feedback_text`) VALUES
-(1, 1, '2024-02-28 22:01:34', 'I love the events'),
-(2, 1, '2024-02-28 22:03:59', 'This website is amazing'),
-(3, 1, '2024-02-28 22:05:07', 'this is a feedback message');
+(10, 5, '2024-03-25 13:40:52', 'Thank you for the information and making events available to us. I appriciate.');
 
 -- --------------------------------------------------------
 
@@ -163,8 +171,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`) VALUES
-(1, 'johndoe@gmail.com', 'johndoe@gmail.com', '$2y$10$.Zh9BJEkpSIJiEpHHp5vvOjRYacLRnPhj4wC5YL9gdFyg5skK2kr2', '2024-02-28 18:13:12'),
-(2, 'janedoe@gmail.com', 'janedoe@gmail.com', '$2y$10$lfCdQ2YObPPQz/6vrTicSuXTbj3jw.fhg85djgT.uxYcXbTbwbW46', '2024-02-28 20:06:53');
+(4, 'Slade Wilson', 'sledwilson@gmail.com', '$2y$10$wD2NpctliKOZ6KF472XjZetSfJ80l3lzJ9xrUZPgAYTCtfNOGWv22', '2024-03-25 08:05:23'),
+(5, 'JohnDoe1', 'johndoe@gmail.com', '$2y$10$5OD/XkUmYpcALDxmX4T0R.HyQwS7MiXWOim8rMfQ9T8o.kzAxHCoW', '2024-03-25 10:10:15');
 
 --
 -- Indexes for dumped tables
@@ -199,6 +207,14 @@ ALTER TABLE `events`
   ADD KEY `category_id` (`category_id`);
 
 --
+-- Indexes for table `event_bookings`
+--
+ALTER TABLE `event_bookings`
+  ADD PRIMARY KEY (`booking_id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
@@ -219,37 +235,43 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `category_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `comments`
 --
 ALTER TABLE `comments`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `event_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+
+--
+-- AUTO_INCREMENT for table `event_bookings`
+--
+ALTER TABLE `event_bookings`
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
-  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
@@ -267,6 +289,13 @@ ALTER TABLE `comments`
 --
 ALTER TABLE `events`
   ADD CONSTRAINT `events_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`);
+
+--
+-- Constraints for table `event_bookings`
+--
+ALTER TABLE `event_bookings`
+  ADD CONSTRAINT `event_bookings_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  ADD CONSTRAINT `event_bookings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `feedbacks`

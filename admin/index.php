@@ -1,17 +1,13 @@
 <?php
-// Start or resume session
 session_start();
 
-// Check if admin is logged in, if not, redirect to login page
 if (!isset($_SESSION['admin_id'])) {
     header('Location: login.php');
     exit();
 }
 
-// Include database connection
 require_once '../includes/db.php';
 
-// Retrieve counts for various entities
 $stmt = $db->query("SELECT COUNT(*) FROM events");
 $total_events = $stmt->fetchColumn();
 
@@ -23,30 +19,26 @@ $total_feedbacks = $stmt->fetchColumn();
 
 $stmt = $db->query("SELECT COUNT(*) FROM users");
 $total_users = $stmt->fetchColumn();
+
+$stmt = $db->query("SELECT COUNT(*) FROM event_bookings");
+$total_booked_events = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
+
 <body>
-    <header>
-        <h1>Admin Dashboard</h1>
-        <nav>
-            <ul>
-                <li><a href="index.php">Dashboard</a></li>
-                <li><a href="manage_events.php">Manage Events</a></li>
-                <li><a href="manage_categories.php">Manage Categories</a></li>
-                <li><a href="manage_feedbacks.php">Manage Feedbacks</a></li>
-                <li><a href="logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </header>
-    <section class="admin-dashboard">
+    <?php
+    include './header.php';
+    ?>
+    <section class="admin-dashboard h-65">
         <div class="container">
             <h2>Welcome, Admin!</h2>
             <div class="summary-cards">
@@ -54,6 +46,11 @@ $total_users = $stmt->fetchColumn();
                     <h3>Total Events</h3>
                     <p><?php echo $total_events; ?></p>
                     <a href="manage_events.php">View Events</a>
+                </div>
+                <div class="card">
+                    <h3>Total Booked Events</h3>
+                    <p><?php echo $total_booked_events; ?></p>
+                    <a href="manage_bookings.php">View Booked Events</a>
                 </div>
                 <div class="card">
                     <h3>Total Users</h3>
@@ -79,4 +76,5 @@ $total_users = $stmt->fetchColumn();
         </div>
     </footer>
 </body>
+
 </html>
