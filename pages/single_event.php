@@ -132,12 +132,20 @@ $message = '';
                     <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required><br><br>
                     <label for="current_location">Current Location/Institution:</label>
                     <input type="text" id="current_location" name="current_location" required><br><br>
-                    <label for="email">Phone Number(Optional):</label>
-                    <input type="text" id="phone_number" name="phone_number" required><br><br>
-                    <!-- Add additional fields relevant to event registration here -->
+                    <label for="phone_number">Phone Number:</label>
+                    <?php
+                    $user_id = $_SESSION['user_id'];
+                    $stmt = $db->prepare("SELECT phone_number FROM users WHERE user_id = :user_id");
+                    $stmt->bindParam(':user_id', $user_id);
+                    $stmt->execute();
+                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $phone_number = $user['phone_number'];
+                    ?>
+                    <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required><br><br>
                     <button type="submit">Book Event</button>
                 </form>
             </div>
+
         </div>
     </section>
 

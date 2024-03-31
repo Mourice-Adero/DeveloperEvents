@@ -19,12 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password']; // New field for confirm password
 
     // Validate username
     if (empty($username)) {
         $error_message = "Username is required.";
-    } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
-        $error_message = "Username can only contain letters, numbers, and underscores.";
+    } elseif (!preg_match('/^[a-zA-Z\s]+$/', $username)) {
+        $error_message = "Username can only contain letters and spaces.";
     }
 
     // Validate email
@@ -39,6 +40,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error_message = "Password is required.";
     } elseif (strlen($password) < 6) {
         $error_message = "Password must be at least 6 characters long.";
+    } elseif ($password !== $confirm_password) { // Check if passwords match
+        $error_message = "Passwords do not match.";
     }
 
     // If no error, attempt to register the user
@@ -155,6 +158,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="email" id="email" name="email" required value="<?php echo htmlspecialchars($email); ?>">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
+                <label for="confirm_password">Confirm Password:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
                 <button type="submit">Register</button>
             </form>
             <p>Already have an account? <a href="login.php">Login here</a></p>

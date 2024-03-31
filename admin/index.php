@@ -63,18 +63,14 @@ $total_booked_events = $stmt->fetchColumn();
                     <a href="manage_categories.php">View Categories</a>
                 </div>
                 <div class="card">
-                    <h3>Total Feedbacks</h3>
+                    <h3>Feedbacks/Messages</h3>
                     <p><?php echo $total_feedbacks; ?></p>
                     <a href="manage_feedbacks.php">View Feedbacks</a>
                 </div>
             </div>
         </div>
     </section>
-    <footer>
-        <div class="container">
-            <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
-        </div>
-    </footer>
+    <?php include './footer.php' ?>
 </body>
 
 </html>

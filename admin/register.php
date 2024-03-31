@@ -167,6 +167,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: red;
             margin-top: 10px;
         }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 
@@ -201,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endif; ?>
                 </div>
                 <button type="submit">Add Admin</button>
-                <a href="./manage_users.php"><button>Cancel</button></a>
+                <a href="./manage_users.php" class="button">Cancel</a>
             </form>
         </div>
     </section>

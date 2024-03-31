@@ -41,38 +41,72 @@ $records_per_page = 10;
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $offset = ($page - 1) * $records_per_page;
 
-$filter_location = isset($_GET['current_location']) ? $_GET['current_location'] : '';
+$filter_event_name = isset($_GET['event_name']) ? $_GET['event_name'] : '';
 
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE (:current_location = '' OR current_location = :current_location)");
-$stmt->bindParam(':current_location', $filter_location);
+// Adjusted SQL query for total bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
 $stmt->execute();
 $total_bookings = $stmt->fetchColumn();
 
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '0' AND confirmation_status = '0' AND (:current_location = '' OR current_location = :current_location)");
-$stmt->bindParam(':current_location', $filter_location);
+// Adjusted SQL query for pending bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '0' AND confirmation_status = '0' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
 $stmt->execute();
 $pending_bookings = $stmt->fetchColumn();
 
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '1' AND (:current_location = '' OR current_location = :current_location)");
-$stmt->bindParam(':current_location', $filter_location);
+// Adjusted SQL query for cancelled bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
 $stmt->execute();
 $cancelled_bookings = $stmt->fetchColumn();
 
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE confirmation_status = '1' AND (:current_location = '' OR current_location = :current_location)");
-$stmt->bindParam(':current_location', $filter_location);
+// Adjusted SQL query for confirmed bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE confirmation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
 $stmt->execute();
 $confirmed_bookings = $stmt->fetchColumn();
 
-$stmt = $db->prepare("SELECT * FROM event_bookings WHERE (:current_location = '' OR current_location = :current_location) ORDER BY booking_date DESC LIMIT :offset, :records_per_page");
-$stmt->bindParam(':current_location', $filter_location);
+// Retrieve distinct event names
+$stmt = $db->prepare("SELECT DISTINCT event_name FROM events");
+$stmt->execute();
+$event_names = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+// Adjusted SQL query for fetching bookings based on selected event name
+$stmt = $db->prepare("SELECT * FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name)) ORDER BY booking_date DESC LIMIT :offset, :records_per_page");
+$stmt->bindParam(':event_name', $filter_event_name);
 $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindParam(':records_per_page', $records_per_page, PDO::PARAM_INT);
 $stmt->execute();
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $error_message = '';
-if (isset($_GET['current_location']) && empty($bookings) && !empty($_GET['current_location'])) {
-    $error_message = 'No bookings found for the selected location.';
+if (isset($_GET['event_name']) && empty($bookings) && !empty($_GET['event_name'])) {
+    $error_message = 'No bookings found for the selected event.';
+}
+
+// Function to get username by user ID
+function get_username_by_id($user_id)
+{
+    global $db;
+
+    $stmt = $db->prepare("SELECT username FROM users WHERE user_id = :user_id");
+    $stmt->bindParam(':user_id', $user_id);
+    $stmt->execute();
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $user['username'];
+}
+
+// Function to get Event name by user ID
+function get_eventname_by_id($event_id)
+{
+    global $db;
+
+    $stmt = $db->prepare("SELECT event_name FROM events WHERE event_id = :event_id");
+    $stmt->bindParam(':event_id', $event_id);
+    $stmt->execute();
+    $event = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $event['event_name'];
 }
 ?>
 
@@ -124,8 +158,12 @@ if (isset($_GET['current_location']) && empty($bookings) && !empty($_GET['curren
             <?php endif; ?>
             <div class="booking-filters">
                 <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="GET">
-                    <label for="current_location">Filter by Location:</label>
-                    <select name="current_location" id="current_location">
+                    <label for="event_name">Filter by Event:</label>
+                    <select name="event_name" id="event_name">
+                        <option value="">All</option>
+                        <?php foreach ($event_names as $name) : ?>
+                            <option value="<?php echo $name; ?>" <?php echo ($filter_event_name == $name) ? 'selected' : ''; ?>><?php echo $name; ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <button type="submit">Filter</button>
                 </form>
@@ -134,20 +172,24 @@ if (isset($_GET['current_location']) && empty($bookings) && !empty($_GET['curren
                 <table>
                     <thead>
                         <tr>
-                            <th>Booking ID</th>
-                            <th>User ID</th>
+                            <th>#</th>
+                            <th>Username</th>
                             <th>Phone Number</th>
-                            <th>Location</th>
+                            <th>Event</th>
+                            <th>User Location</th>
                             <th>Status</th>
                             <th>Booking Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($bookings as $booking) : ?>
+                        <?php
+                        $counter = 1;
+                        foreach ($bookings as $booking) : ?>
                             <tr>
-                                <td><?php echo $booking['booking_id']; ?></td>
-                                <td><?php echo $booking['user_id']; ?></td>
+                                <td><?php echo $counter++; ?></td>
+                                <td><?php echo get_username_by_id($booking['user_id']); ?></td>
                                 <td><?php echo $booking['phone_number']; ?></td>
+                                <td><?php echo get_eventname_by_id($booking['event_id']); ?></td>
                                 <td><?php echo $booking['current_location']; ?></td>
                                 <td>
                                     <?php
@@ -165,6 +207,7 @@ if (isset($_GET['current_location']) && empty($bookings) && !empty($_GET['curren
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
                 <?php if ($total_bookings > $records_per_page) : ?>
                     <div class="pagination">
                         <?php

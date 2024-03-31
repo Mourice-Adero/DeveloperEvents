@@ -48,8 +48,17 @@
                 <li><a href="manage_bookings.php">Booked-Events</a></li>
                 <li><a href="manage_categories.php">Categories</a></li>
                 <li><a href="manage_feedbacks.php">Feedbacks</a></li>
-                <li><a href="logout.php">Logout</a></li>
+                <li><a href="#" onclick="confirmLogout()">Logout</a></li>
             </ul>
         </nav>
     </div>
 </header>
+
+<script>
+    function confirmLogout() {
+        var confirmLogout = confirm("Are you sure you want to logout?");
+        if (confirmLogout) {
+            window.location.href = "logout.php";
+        }
+    }
+</script>

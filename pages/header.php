@@ -51,13 +51,15 @@
                 <li><a href="past_events.php">Past Events</a></li>
                 <li><a href="about_us.php">About Us</a></li>
                 <li><a href="feedback.php">Feedback</a></li>
+                <li><a href="connect.php">Connect</a></li>
+                <li><a href="support.php">Support</a></li>
 
                 <?php
                 // Check if user is logged in
                 if (isset($_SESSION['user_id'])) {
-                    // If logged in, display profile and logout links
+                    // If logged in, display profile and logout links with confirmation prompt
                     echo '<li><a href="profile.php">Profile</a></li>';
-                    echo '<li><a href="../auth/logout.php">Logout</a></li>';
+                    echo '<li><a href="#" onclick="logout()">Logout</a></li>';
                 } else {
                     // If not logged in, display login and register links
                     echo '<li><a href="../auth/login.php">Login</a></li>';
@@ -68,3 +70,11 @@
         </nav>
     </div>
 </header>
+
+<script>
+    function logout() {
+        if (confirm("Are you sure you want to logout?")) {
+            window.location.href = "../auth/logout.php";
+        }
+    }
+</script>

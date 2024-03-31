@@ -68,7 +68,8 @@ textarea {
   margin-bottom: 10px;
 }
 
-button {
+button,
+.button {
   padding: 10px 20px;
   background-color: #333;
   color: #fff;
@@ -76,7 +77,8 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:hover,
+.button:hover {
   background-color: #555;
 }
 

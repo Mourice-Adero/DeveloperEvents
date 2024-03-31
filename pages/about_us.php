@@ -75,7 +75,8 @@
             <div class="container">
                 <h2>Contact Us</h2>
                 <p class="p-3"><strong>Phone:</strong> +254 020 123 458</p>
-                <p class="p-3"><strong>Email:</strong> info@developerevents.co.ke</p>
+                <p class="p-3"><strong>Email:</strong> info@developerevents.co.ke</p><br><br>
+                <p>You can send a dirrect message on the feedback page <a href="feedback.php">Feedback page</a></p>
             </div>
             <div class="container">
                 <img src="./../assets/images/pngegg (3).png" alt="About Us Image">

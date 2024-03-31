@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 25, 2024 at 01:02 PM
+-- Generation Time: Mar 31, 2024 at 06:40 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -130,7 +130,31 @@ CREATE TABLE `event_bookings` (
 --
 
 INSERT INTO `event_bookings` (`booking_id`, `event_id`, `user_id`, `current_location`, `phone_number`, `booking_time`, `cancellation_status`, `confirmation_status`, `booking_date`) VALUES
-(29, 21, 5, 'Nakuru', '0712345678', '2024-03-25 10:19:07', 1, 0, '2024-03-25 10:19:07');
+(29, 21, 5, 'Nakuru', '0712345678', '2024-03-25 10:19:07', 1, 0, '2024-03-25 10:19:07'),
+(32, 22, 5, 'Njoro', '0746301104', '2024-03-28 15:25:18', 0, 1, '2024-03-28 15:25:18'),
+(33, 23, 7, 'Njoro', '0712345678', '2024-03-31 13:49:29', 0, 0, '2024-03-31 13:49:29'),
+(34, 21, 7, 'Nakuru', '0712345678', '2024-03-31 16:03:37', 0, 0, '2024-03-31 16:03:37');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `event_feedback`
+--
+
+CREATE TABLE `event_feedback` (
+  `feedback_id` int(11) NOT NULL,
+  `event_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `feedback` text NOT NULL,
+  `feedback_time` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `event_feedback`
+--
+
+INSERT INTO `event_feedback` (`feedback_id`, `event_id`, `user_id`, `feedback`, `feedback_time`) VALUES
+(1, 23, 7, 'great!', '2024-03-31 14:18:14');
 
 -- --------------------------------------------------------
 
@@ -155,6 +179,19 @@ INSERT INTO `feedbacks` (`feedback_id`, `user_id`, `feedback_date`, `feedback_te
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `password_reset`
+--
+
+CREATE TABLE `password_reset` (
+  `id` int(11) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `code` varchar(20) NOT NULL,
+  `expiry` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -163,16 +200,23 @@ CREATE TABLE `users` (
   `username` varchar(50) NOT NULL,
   `email` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `phone_number` varchar(20) DEFAULT NULL,
+  `visibility` tinyint(1) DEFAULT 0,
+  `profession` varchar(100) DEFAULT NULL,
+  `linkedin` varchar(255) DEFAULT NULL,
+  `twitter` varchar(255) DEFAULT NULL,
+  `github` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`) VALUES
-(4, 'Slade Wilson', 'sledwilson@gmail.com', '$2y$10$wD2NpctliKOZ6KF472XjZetSfJ80l3lzJ9xrUZPgAYTCtfNOGWv22', '2024-03-25 08:05:23'),
-(5, 'JohnDoe1', 'johndoe@gmail.com', '$2y$10$5OD/XkUmYpcALDxmX4T0R.HyQwS7MiXWOim8rMfQ9T8o.kzAxHCoW', '2024-03-25 10:10:15');
+INSERT INTO `users` (`user_id`, `username`, `email`, `password`, `created_at`, `profile_picture`, `phone_number`, `visibility`, `profession`, `linkedin`, `twitter`, `github`) VALUES
+(5, 'JohnDoe1', 'johndoe@gmail.com', '$2y$10$5OD/XkUmYpcALDxmX4T0R.HyQwS7MiXWOim8rMfQ9T8o.kzAxHCoW', '2024-03-25 10:10:15', NULL, NULL, 1, 'Web Developer', NULL, NULL, NULL),
+(7, 'Jane Doe', 'janedoe@gmail.com', '$2y$10$wApRjmB/Sr39qUW0.vJkMOmmTnPEhFnTHgjR8USwKZHeMFRwFDIDa', '2024-03-31 07:19:17', 'vlcsnap-2023-08-05-22h41m37s444.png', '0712345678', 1, 'Student', '', '', '');
 
 --
 -- Indexes for dumped tables
@@ -215,11 +259,25 @@ ALTER TABLE `event_bookings`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `event_feedback`
+--
+ALTER TABLE `event_feedback`
+  ADD PRIMARY KEY (`feedback_id`),
+  ADD KEY `event_id` (`event_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `feedbacks`
 --
 ALTER TABLE `feedbacks`
   ADD PRIMARY KEY (`feedback_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `password_reset`
+--
+ALTER TABLE `password_reset`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `users`
@@ -259,7 +317,13 @@ ALTER TABLE `events`
 -- AUTO_INCREMENT for table `event_bookings`
 --
 ALTER TABLE `event_bookings`
-  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `booking_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+
+--
+-- AUTO_INCREMENT for table `event_feedback`
+--
+ALTER TABLE `event_feedback`
+  MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `feedbacks`
@@ -268,10 +332,16 @@ ALTER TABLE `feedbacks`
   MODIFY `feedback_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
+-- AUTO_INCREMENT for table `password_reset`
+--
+ALTER TABLE `password_reset`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
@@ -296,6 +366,13 @@ ALTER TABLE `events`
 ALTER TABLE `event_bookings`
   ADD CONSTRAINT `event_bookings_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
   ADD CONSTRAINT `event_bookings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `event_feedback`
+--
+ALTER TABLE `event_feedback`
+  ADD CONSTRAINT `event_feedback_ibfk_1` FOREIGN KEY (`event_id`) REFERENCES `events` (`event_id`),
+  ADD CONSTRAINT `event_feedback_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `feedbacks`
