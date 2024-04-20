@@ -35,12 +35,21 @@
     }
 
     nav ul li a:hover {
+        text-decoration: none;
         color: #ffd700;
+        border-bottom: 2px solid #ffd700;
+        padding-bottom: 5px;
+    }
+
+    .title {
+        background: linear-gradient(to right, #ffd700, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 </style>
 <header class="header">
     <div class="header-content">
-        <h1>Admin Dashboard</h1>
+        <h1 class="title">Admin Dashboard</h1>
         <nav>
             <ul>
                 <li><a href="index.php">Dashboard</a></li>

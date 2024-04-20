@@ -147,7 +147,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['search'])) {
                         <option value="<?php echo $category['category_id']; ?>"><?php echo $category['category_name']; ?></option>
                     <?php endforeach; ?>
                 </select>
+                <label for="start-date">From: </label>
                 <input type="date" name="start_date">
+                <label for="end-date">To: </label>
                 <input type="date" name="end_date">
                 <input type="text" name="location" placeholder="Location...">
                 <button type="submit" name="search">Search</button>

@@ -17,11 +17,19 @@ if (!isset($_SESSION['user_id'])) {
     <title>Help & Support</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-        /* Add your custom CSS styles for the help page */
+        body {
+            background: #fff;
+        }
+
+        body::before {
+            background-color: rgba(0, 0, 0, 0);
+        }
+
         .help-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
+            z-index: 1000;
         }
 
         .help-section {
@@ -44,6 +52,12 @@ if (!isset($_SESSION['user_id'])) {
         .help-section ul li {
             margin-bottom: 5px;
         }
+
+        .feedback-link {
+            text-decoration: none;
+            color: #007bff;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -52,7 +66,7 @@ if (!isset($_SESSION['user_id'])) {
     <div class="help-container">
         <h1>Help & Support</h1>
         <div class="section">
-            <p>You can send us direct messages by filling the feedback for in <a href="./feedback.php">Feedback Page</a></p>
+            <p>You can send us direct messages by filling the feedback for in <a href="./feedback.php" class="feedback-link">Feedback Page</a></p>
         </div>
         <div class="help-section">
             <h2>Booking Events</h2>

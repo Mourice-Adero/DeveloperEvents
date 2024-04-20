@@ -140,9 +140,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (isset($error_message)) echo "<p class='error'>$error_message</p>"; ?>
             <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required value="<?php echo htmlspecialchars($username); ?>">
+                <input type="text" id="username" name="username" placeholder="Enter Unsername..." required value="<?php echo htmlspecialchars($username); ?>">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" placeholder="Enter Password..." required>
                 <button type="submit">Login</button>
             </form>
             <p>Forgot your password? <a href="forgot_password.php">Reset it here</a></p>

@@ -43,6 +43,17 @@
     .footer-info p {
         margin: 0;
     }
+
+    .footer-container h3 {
+        border-bottom: 1px solid #ffd700;
+        padding: 5px;
+    }
+
+    .footer-title {
+        background: linear-gradient(to right, #ffd700, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 </style>
 <footer>
     <div class="footer-container">
@@ -58,7 +69,7 @@
             <p>Phone: +254 (123) 456-7890</p>
         </div>
         <div class="footer-info">
-            <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
+            <p class="footer-title">&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
         </div>
     </div>
 </footer>

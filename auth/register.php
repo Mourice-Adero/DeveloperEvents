@@ -153,13 +153,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php if (isset($error_message)) echo "<p class='error'>$error_message</p>"; ?>
             <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required value="<?php echo htmlspecialchars($username); ?>">
+                <input type="text" id="username" name="username" placeholder="Enter Username..." required value="<?php echo htmlspecialchars($username); ?>">
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required value="<?php echo htmlspecialchars($email); ?>">
+                <input type="email" id="email" name="email" placeholder="Enter Email..." required value="<?php echo htmlspecialchars($email); ?>">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" placeholder="Enter Password..." name="password" required>
                 <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <input type="password" id="confirm_password" placeholder="Confirm Password..." name="confirm_password" required>
                 <button type="submit">Register</button>
             </form>
             <p>Already have an account? <a href="login.php">Login here</a></p>

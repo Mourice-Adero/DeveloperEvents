@@ -55,7 +55,6 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -73,6 +72,25 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
         .error {
             color: red;
         }
+
+        @media print {
+            #print-content {
+                display: block !important;
+            }
+
+            .container {
+                max-width: none;
+                width: auto;
+            }
+
+            .feedback-table {
+                max-height: none;
+            }
+
+            .footer {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -80,27 +98,30 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
     <?php
     include './header.php';
     ?>
-    <section class="admin-content">
+    <section class="admin-content h-65">
         <div class="container">
             <h2>Manage Feedbacks</h2>
             <?php if ($error_message) : ?>
                 <p class="error"><?php echo $error_message; ?></p>
             <?php else : ?>
                 <h3>General Feedbacks (Messages)</h3>
-                <table class="feedback-table">
-                    <tr>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Feedback</th>
-                    </tr>
-                    <?php foreach ($feedbacks as $feedback) : ?>
+                <button onclick="printGeneralFeedbacks()">Print General Feedbacks</button>
+                <div class="printable-content" id="general-feedbacks">
+                    <table class="feedback-table">
                         <tr>
-                            <td><?php echo $feedback['username']; ?></td>
-                            <td><?php echo date('M d, Y', strtotime($feedback['feedback_date'])); ?></td>
-                            <td><?php echo $feedback['feedback_text']; ?></td>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Feedback</th>
                         </tr>
-                    <?php endforeach; ?>
-                </table>
+                        <?php foreach ($feedbacks as $feedback) : ?>
+                            <tr>
+                                <td><?php echo $feedback['username']; ?></td>
+                                <td><?php echo date('M d, Y', strtotime($feedback['feedback_date'])); ?></td>
+                                <td><?php echo $feedback['feedback_text']; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
 
                 <h3>Event Feedbacks</h3>
                 <form action="" method="GET">
@@ -113,22 +134,25 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
                     </select>
                     <button type="submit">Apply Filter</button>
                 </form>
-                <table class="feedback-table">
-                    <tr>
-                        <th>Event Name</th>
-                        <th>User</th>
-                        <th>Date</th>
-                        <th>Feedback</th>
-                    </tr>
-                    <?php foreach ($filtered_feedbacks as $event_feedback) : ?>
+                <button onclick="printEventFeedbacks()">Print Event Feedbacks</button>
+                <div class="printable-content" id="event-feedbacks">
+                    <table class="feedback-table">
                         <tr>
-                            <td><?php echo $event_feedback['event_name']; ?></td>
-                            <td><?php echo $event_feedback['username']; ?></td>
-                            <td><?php echo date('M d, Y', strtotime($event_feedback['feedback_time'])); ?></td>
-                            <td><?php echo $event_feedback['feedback']; ?></td>
+                            <th>Event Name</th>
+                            <th>User</th>
+                            <th>Date</th>
+                            <th>Feedback</th>
                         </tr>
-                    <?php endforeach; ?>
-                </table>
+                        <?php foreach ($filtered_feedbacks as $event_feedback) : ?>
+                            <tr>
+                                <td><?php echo $event_feedback['event_name']; ?></td>
+                                <td><?php echo $event_feedback['username']; ?></td>
+                                <td><?php echo date('M d, Y', strtotime($event_feedback['feedback_time'])); ?></td>
+                                <td><?php echo $event_feedback['feedback']; ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </table>
+                </div>
             <?php endif; ?>
         </div>
     </section>
@@ -137,6 +161,24 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
             <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        function printGeneralFeedbacks() {
+            var printableContent1 = document.getElementById('general-feedbacks').innerHTML;
+            var originalContent1 = document.body.innerHTML;
+            document.body.innerHTML = printableContent1;
+            window.print();
+            document.body.innerHTML = originalContent1;
+        }
+
+        function printEventFeedbacks() {
+            var printableContent = document.getElementById('event-feedbacks').innerHTML;
+            var originalContent = document.body.innerHTML;
+            document.body.innerHTML = printableContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+    </script>
 </body>
 
 </html>

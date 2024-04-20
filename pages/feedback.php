@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
     <?php include "./header.php"; ?>
-    <section class="feedback h-65">
+    <section class="feedback h-65" style="margin-bottom: 0;">
         <div class="container">
             <h2>Feedback</h2>
             <!-- Display thank you message -->

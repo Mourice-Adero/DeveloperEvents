@@ -110,6 +110,11 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
             display: flex;
             flex-wrap: wrap;
         }
+
+        .titles {
+            border-bottom: 2px solid #ffd700;
+            padding-bottom: 5px;
+        }
     </style>
 </head>
 
@@ -119,7 +124,7 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
         <section class="user-profile">
             <div class="container profile-container">
                 <div>
-                    <h2>User Details</h2>
+                    <h2 class="titles">User Details</h2>
                     <?php
                     // Initialize message variable
                     $message = '';
@@ -172,7 +177,7 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
                         </div>
                     <?php endif; ?>
                     <div class="profile-form-container">
-                        <h3>Update Profile</h3>
+                        <h3 class="titles">Update Profile</h3>
                         <!-- Form to update user details -->
                         <form action="update_profile.php" method="POST" class="profile-form" enctype="multipart/form-data">
                             <input type="file" name="profile_picture">
@@ -202,7 +207,7 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
         <!-- Section for displaying booked events -->
         <section class="booked-events">
             <div class="container">
-                <h2>Booked Events</h2>
+                <h2 class="titles">Booked Events</h2>
                 <?php echo $feedback_message; ?>
                 <?php echo $feedback_error_message; ?>
                 <table>

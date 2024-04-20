@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment'])) {
     <?php
     include './header.php';
     ?>
-    <section class="admin-content">
+    <section class="admin-content h-65">
         <div class="container">
             <h2>Manage Comments</h2>
             <?php if (isset($error_message)) : ?>

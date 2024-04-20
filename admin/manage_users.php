@@ -91,7 +91,7 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
     <?php
     include './header.php';
     ?>
-    <section class="admin-content">
+    <section class="admin-content h-65">
         <div class="container">
             <h2>Manage Users</h2>
             <!-- Display error message if there is an issue fetching users -->

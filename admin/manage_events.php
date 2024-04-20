@@ -145,6 +145,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
         .error-messages p {
             margin: 0;
         }
+
+        .print-container {
+            display: none;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .print-container,
+            .print-container * {
+                visibility: visible;
+            }
+
+            .print-container {
+                /* position: static; */
+                display: block;
+            }
+
+            .admin-content {
+                display: none !important;
+            }
+
+            .print-container button {
+                display: none;
+            }
+        }
     </style>
 </head>
 
@@ -152,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
     <?php
     include './header.php';
     ?>
-    <section class="admin-content">
+    <section class="admin-content h-65">
         <div class="container">
             <h2>Add Event</h2>
             <div class="d-flex">
@@ -196,6 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
                 </div>
                 <div class="">
                     <h2>Manage Events</h2>
+                    <button onclick="printTable()">Print Table</button>
                     <table>
                         <tr>
                             <th>Event Name</th>
@@ -255,6 +284,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
             <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
         </div>
     </footer>
+    <div class="print-container">
+        <?php if (!empty($error_messages)) : ?>
+            <div class="error-messages">
+                <?php foreach ($error_messages as $error) : ?>
+                    <p><?php echo $error; ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <h2>Events</h2>
+        <!-- Display the events table -->
+        <table>
+            <!-- Table header -->
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Event Name</th>
+                    <th>Date / From</th>
+                    <th>Date / To</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Display events -->
+                <?php
+                $counter = 1;
+                foreach ($events as $event) : ?>
+                    <tr>
+                        <td><?php echo $counter++; ?></td>
+                        <td><?php echo $event['event_name']; ?></td>
+                        <td><?php echo date('M d, Y', strtotime($event['event_from'])); ?></td>
+                        <td><?php echo date('M d, Y', strtotime($event['event_to'])); ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+        <!-- Display total events -->
+        <p>Total Events: <?php echo $total_events; ?></p>
+
+        <!-- Pagination links -->
+        <div class="pagination">
+            <?php
+            $total_pages = ceil($total_events / $records_per_page);
+            if ($total_pages > 1) {
+                echo '<div class="pagination">';
+                if ($page > 1) {
+                    echo '<a href="manage_events.php?page=' . ($page - 1) . '">Previous</a>';
+                }
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    if ($i === $page) {
+                        echo '<span>' . $i . '</span>';
+                    } else {
+                        echo '<a href="manage_events.php?page=' . $i . '">' . $i . '</a>';
+                    }
+                }
+                if ($page < $total_pages) {
+                    echo '<a href="manage_events.php?page=' . ($page + 1) . '">Next</a>';
+                }
+                echo '</div>';
+            }
+            ?>
+        </div>
+    </div>
+    <script>
+        function printTable() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

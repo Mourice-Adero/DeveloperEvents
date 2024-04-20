@@ -119,6 +119,23 @@ function get_eventname_by_id($event_id)
     <title>Manage Bookings - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .print-container,
+            .print-container * {
+                visibility: visible;
+            }
+
+            .print-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+
         .pending {
             color: white;
             background-color: greenyellow;
@@ -168,7 +185,8 @@ function get_eventname_by_id($event_id)
                     <button type="submit">Filter</button>
                 </form>
             </div>
-            <div class="booking-list">
+            <div class="booking-list print-container">
+                <button onclick="printTable()">Print Table</button>
                 <table>
                     <thead>
                         <tr>
@@ -226,6 +244,11 @@ function get_eventname_by_id($event_id)
             <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
         </div>
     </footer>
+    <script>
+        function printTable() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

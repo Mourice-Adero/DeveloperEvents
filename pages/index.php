@@ -55,6 +55,15 @@ session_start();
         .btn {
             margin-top: 20px;
         }
+
+        .text-content h2 {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        .title-text {
+            color: #a88d07;
+        }
     </style>
 </head>
 
@@ -95,7 +104,7 @@ session_start();
                 <div class="container2">
                     <!-- Text content -->
                     <div class="text-content">
-                        <h2>Welcome to Developer Events</h2>
+                        <h2>Welcome to <span class="title-text">Developer Events</span></h2>
                         <p>Find and explore developer events from around the world. Join us to enhance your skills, connect with peers, and stay updated with the latest trends in technology.</p>
                         <a href="events.php" class="btn"><button>View Events</button></a>
                     </div>

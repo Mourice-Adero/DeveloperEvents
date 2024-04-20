@@ -33,17 +33,25 @@
     nav ul li a {
         color: #fff;
         text-decoration: none;
-        font-size: 18px;
+        font-size: 20px;
     }
 
     nav ul li a:hover {
+        text-decoration: none;
         color: #ffd700;
-        /* Change color on hover as needed */
+        border-bottom: 2px solid #ffd700;
+        padding-bottom: 5px;
+    }
+
+    .title {
+        background: linear-gradient(to right, #ffd700, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
     }
 </style>
 <header class="header">
     <div class="header-content">
-        <h1>Developer Events</h1>
+        <h1 class="title">Developer Events</h1>
         <nav>
             <ul>
                 <li><a href="index.php">Home</a></li>
