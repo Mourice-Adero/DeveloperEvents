@@ -11,10 +11,10 @@ body {
   line-height: 1.6;
   background-color: #f4f4f4;
   color: #333;
-  background-image: url("./../images/body-bg.png"); /* Replace 'path/to/your/image.png' with the actual path to your image */
+  background-image: url("./../images/body-bg.png");
   background-size: cover;
   background-position: center;
-  position: relative; /* Required for overlay */
+  position: relative; 
   z-index: 999;
 }
 
@@ -27,7 +27,7 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.253); /* Adjust transparency as needed */
+  background-color: rgba(0, 0, 0, 0.253);
 }
 
 /* Header styles */
