@@ -75,6 +75,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         }
     }
 
+    // Validate social media links
+    if (!empty($linkedin) && !filter_var($linkedin, FILTER_VALIDATE_URL)) {
+        $errors[] = "Invalid LinkedIn URL.";
+    }
+    if (!empty($twitter) && !filter_var($twitter, FILTER_VALIDATE_URL)) {
+        $errors[] = "Invalid Twitter URL.";
+    }
+    if (!empty($github) && !filter_var($github, FILTER_VALIDATE_URL)) {
+        $errors[] = "Invalid GitHub URL.";
+    }
+
     // If there are no errors, proceed with updating profile
     if (empty($errors)) {
         // Upload file if selected
@@ -112,7 +123,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
         $update_stmt->bindParam(':github', $github);
         $update_stmt->bindParam(':user_id', $_SESSION['user_id']);
         $update_stmt->execute();
-
 
         // Set session variable to indicate profile update success
         $_SESSION['profile_updated'] = true;

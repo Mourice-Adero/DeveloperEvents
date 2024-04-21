@@ -42,41 +42,33 @@ $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $offset = ($page - 1) * $records_per_page;
 
 $filter_event_name = isset($_GET['event_name']) ? $_GET['event_name'] : '';
+$filter_status = isset($_GET['status']) ? $_GET['status'] : '';
+
+$status_confirmed = ($filter_status == 'confirmed') ? 1 : 0;
+$status_cancelled = ($filter_status == 'cancelled') ? 1 : 0;
 
 // Adjusted SQL query for total bookings
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name)) AND (:status = '' OR (confirmation_status = :status_confirmed AND cancellation_status = :status_cancelled))");
 $stmt->bindParam(':event_name', $filter_event_name);
+$stmt->bindParam(':status', $filter_status);
+$stmt->bindParam(':status_confirmed', $status_confirmed, PDO::PARAM_INT);
+$stmt->bindParam(':status_cancelled', $status_cancelled, PDO::PARAM_INT);
 $stmt->execute();
 $total_bookings = $stmt->fetchColumn();
-
-// Adjusted SQL query for pending bookings
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '0' AND confirmation_status = '0' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
-$stmt->bindParam(':event_name', $filter_event_name);
-$stmt->execute();
-$pending_bookings = $stmt->fetchColumn();
-
-// Adjusted SQL query for cancelled bookings
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
-$stmt->bindParam(':event_name', $filter_event_name);
-$stmt->execute();
-$cancelled_bookings = $stmt->fetchColumn();
-
-// Adjusted SQL query for confirmed bookings
-$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE confirmation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
-$stmt->bindParam(':event_name', $filter_event_name);
-$stmt->execute();
-$confirmed_bookings = $stmt->fetchColumn();
 
 // Retrieve distinct event names
 $stmt = $db->prepare("SELECT DISTINCT event_name FROM events");
 $stmt->execute();
 $event_names = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Adjusted SQL query for fetching bookings based on selected event name
-$stmt = $db->prepare("SELECT * FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name)) ORDER BY booking_date DESC LIMIT :offset, :records_per_page");
+// Adjusted SQL query for fetching bookings based on selected event name and status
+$stmt = $db->prepare("SELECT * FROM event_bookings WHERE (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name)) AND (:status = '' OR (confirmation_status = :status_confirmed AND cancellation_status = :status_cancelled)) ORDER BY booking_date DESC LIMIT :offset, :records_per_page");
 $stmt->bindParam(':event_name', $filter_event_name);
-$stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-$stmt->bindParam(':records_per_page', $records_per_page, PDO::PARAM_INT);
+$stmt->bindParam(':status', $filter_status);
+$stmt->bindParam(':status_confirmed', $status_confirmed, PDO::PARAM_INT);
+$stmt->bindParam(':status_cancelled', $status_cancelled, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->bindValue(':records_per_page', $records_per_page, PDO::PARAM_INT);
 $stmt->execute();
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -108,6 +100,24 @@ function get_eventname_by_id($event_id)
     $event = $stmt->fetch(PDO::FETCH_ASSOC);
     return $event['event_name'];
 }
+// Adjusted SQL query for pending bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '0' AND confirmation_status = '0' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
+$stmt->execute();
+$pending_bookings = $stmt->fetchColumn();
+
+// Adjusted SQL query for cancelled bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE cancellation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
+$stmt->execute();
+$cancelled_bookings = $stmt->fetchColumn();
+
+// Adjusted SQL query for confirmed bookings
+$stmt = $db->prepare("SELECT COUNT(*) FROM event_bookings WHERE confirmation_status = '1' AND (:event_name = '' OR event_id = (SELECT event_id FROM events WHERE event_name = :event_name))");
+$stmt->bindParam(':event_name', $filter_event_name);
+$stmt->execute();
+$confirmed_bookings = $stmt->fetchColumn();
+
 ?>
 
 <!DOCTYPE html>
@@ -119,6 +129,10 @@ function get_eventname_by_id($event_id)
     <title>Manage Bookings - Admin Panel</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
+        .doc-title {
+            display: none;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -133,6 +147,14 @@ function get_eventname_by_id($event_id)
                 position: absolute;
                 left: 0;
                 top: 0;
+            }
+
+            .doc-title {
+                display: block;
+            }
+
+            .print-button {
+                display: none;
             }
         }
 
@@ -182,11 +204,19 @@ function get_eventname_by_id($event_id)
                             <option value="<?php echo $name; ?>" <?php echo ($filter_event_name == $name) ? 'selected' : ''; ?>><?php echo $name; ?></option>
                         <?php endforeach; ?>
                     </select>
+                    <label for="status">Filter by Status:</label>
+                    <select name="status" id="status">
+                        <option value="">All</option>
+                        <option value="pending" <?php echo ($filter_status == 'pending') ? 'selected' : ''; ?>>Pending</option>
+                        <option value="confirmed" <?php echo ($filter_status == 'confirmed') ? 'selected' : ''; ?>>Confirmed</option>
+                        <option value="cancelled" <?php echo ($filter_status == 'cancelled') ? 'selected' : ''; ?>>Cancelled</option>
+                    </select>
                     <button type="submit">Filter</button>
                 </form>
             </div>
             <div class="booking-list print-container">
-                <button onclick="printTable()">Print Table</button>
+                <button onclick="printTable()" class="print-button">Print Table</button>
+                <h1 class="doc-title">Bookings</h1>
                 <table>
                     <thead>
                         <tr>

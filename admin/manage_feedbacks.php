@@ -53,6 +53,26 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
     $selected_event_name = '';
     $filtered_feedbacks = $event_feedbacks;
 }
+
+// Handle delete action for general feedbacks
+if (isset($_POST['delete_feedback'])) {
+    $feedback_id = $_POST['feedback_id'];
+    $stmt = $db->prepare("DELETE FROM feedbacks WHERE feedback_id = :feedback_id");
+    $stmt->bindParam(':feedback_id', $feedback_id);
+    $stmt->execute();
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+// Handle delete action for event feedbacks
+if (isset($_POST['delete_event_feedback'])) {
+    $feedback_id = $_POST['feedback_id'];
+    $stmt = $db->prepare("DELETE FROM event_feedback WHERE feedback_id = :feedback_id");
+    $stmt->bindParam(':feedback_id', $feedback_id);
+    $stmt->execute();
+    header('Location: ' . $_SERVER['PHP_SELF']);
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -73,6 +93,10 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
             color: red;
         }
 
+        .doc-title {
+            display: none;
+        }
+
         @media print {
             #print-content {
                 display: block !important;
@@ -89,6 +113,10 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
 
             .footer {
                 display: none;
+            }
+
+            .doc-title {
+                display: block;
             }
         }
     </style>
@@ -112,12 +140,19 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
                             <th>User</th>
                             <th>Date</th>
                             <th>Feedback</th>
+                            <th>Action</th>
                         </tr>
                         <?php foreach ($feedbacks as $feedback) : ?>
                             <tr>
                                 <td><?php echo $feedback['username']; ?></td>
                                 <td><?php echo date('M d, Y', strtotime($feedback['feedback_date'])); ?></td>
                                 <td><?php echo $feedback['feedback_text']; ?></td>
+                                <td>
+                                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
+                                        <input type="hidden" name="feedback_id" value="<?php echo $feedback['feedback_id']; ?>">
+                                        <button type="submit" name="delete_feedback">Delete</button>
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
@@ -142,6 +177,7 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
                             <th>User</th>
                             <th>Date</th>
                             <th>Feedback</th>
+                            <th>Action</th>
                         </tr>
                         <?php foreach ($filtered_feedbacks as $event_feedback) : ?>
                             <tr>
@@ -149,6 +185,12 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
                                 <td><?php echo $event_feedback['username']; ?></td>
                                 <td><?php echo date('M d, Y', strtotime($event_feedback['feedback_time'])); ?></td>
                                 <td><?php echo $event_feedback['feedback']; ?></td>
+                                <td>
+                                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
+                                        <input type="hidden" name="feedback_id" value="<?php echo $event_feedback['feedback_id']; ?>">
+                                        <button type="submit" name="delete_event_feedback">Delete</button>
+                                    </form>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </table>
@@ -173,6 +215,22 @@ if (isset($_GET['event_name']) && in_array($_GET['event_name'], $event_names)) {
 
         function printEventFeedbacks() {
             var printableContent = document.getElementById('event-feedbacks').innerHTML;
+            var originalContent = document.body.innerHTML;
+            document.body.innerHTML = printableContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+        }
+
+        function printGeneralFeedbacks() {
+            var printableContent1 = '<h1 class="doc-title">General Feedbacks (Messages)</h1>' + document.getElementById('general-feedbacks').innerHTML;
+            var originalContent1 = document.body.innerHTML;
+            document.body.innerHTML = printableContent1;
+            window.print();
+            document.body.innerHTML = originalContent1;
+        }
+
+        function printEventFeedbacks() {
+            var printableContent = '<h1 class="doc-title">Event Feedbacks</h1>' + document.getElementById('event-feedbacks').innerHTML;
             var originalContent = document.body.innerHTML;
             document.body.innerHTML = printableContent;
             window.print();

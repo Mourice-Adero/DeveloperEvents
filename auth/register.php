@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            /* height: 100vh; */
         }
 
         .register-form {
@@ -143,6 +143,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             margin-bottom: 10px;
         }
+
+        .input-suggestion {
+            color: gray;
+        }
     </style>
 </head>
 
@@ -154,14 +158,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" placeholder="Enter Username..." required value="<?php echo htmlspecialchars($username); ?>">
+                <span class="input-suggestion">Use letters, numbers, and underscores</span><br>
+
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" placeholder="Enter Email..." required value="<?php echo htmlspecialchars($email); ?>">
+                <span class="input-suggestion">e.g., example@example.com.</span><br>
+
                 <label for="password">Password:</label>
                 <input type="password" id="password" placeholder="Enter Password..." name="password" required>
+                <span class="input-suggestion">letters, numbers, and special characters.</span><br>
+
                 <label for="confirm_password">Confirm Password:</label>
                 <input type="password" id="confirm_password" placeholder="Confirm Password..." name="confirm_password" required>
+                <span class="input-suggestion">Re-enter your password</span><br>
+
                 <button type="submit">Register</button>
             </form>
+
             <p>Already have an account? <a href="login.php">Login here</a></p>
         </div>
     </div>

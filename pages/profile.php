@@ -179,7 +179,7 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
                     <div class="profile-form-container">
                         <h3 class="titles">Update Profile</h3>
                         <!-- Form to update user details -->
-                        <form action="update_profile.php" method="POST" class="profile-form" enctype="multipart/form-data">
+                        <form action="update_profile.php" method="POST" class="profile-form" enctype="multipart/form-data" id="profile-form">
                             <input type="file" name="profile_picture">
                             <input type="text" name="username" placeholder="Username" value="<?php echo isset($user['username']) ? $user['username'] : ''; ?>" required>
                             <input type="email" name="email" placeholder="Email" value="<?php echo isset($user['email']) ? $user['email'] : ''; ?>" required>
@@ -193,11 +193,12 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
                                 <option value="1" <?php echo ($user['visibility'] == 1) ? 'selected' : ''; ?>>Enabled</option>
                             </select>
                             <input type="text" name="profession" placeholder="Profession" value="<?php echo isset($user['profession']) ? $user['profession'] : ''; ?>">
-                            <input type="text" name="linkedin" placeholder="LinkedIn" value="<?php echo isset($user['linkedin']) ? $user['linkedin'] : ''; ?>">
-                            <input type="text" name="twitter" placeholder="Twitter" value="<?php echo isset($user['twitter']) ? $user['twitter'] : ''; ?>">
-                            <input type="text" name="github" placeholder="GitHub" value="<?php echo isset($user['github']) ? $user['github'] : ''; ?>">
+                            <input type="text" name="linkedin" placeholder="LinkedIn" value="<?php echo isset($user['linkedin']) ? $user['linkedin'] : ''; ?>" onblur="validateLink('linkedin')">
+                            <input type="text" name="twitter" placeholder="Twitter" value="<?php echo isset($user['twitter']) ? $user['twitter'] : ''; ?>" onblur="validateLink('twitter')">
+                            <input type="text" name="github" placeholder="GitHub" value="<?php echo isset($user['github']) ? $user['github'] : ''; ?>" onblur="validateLink('github')">
                             <button type="submit" name="update_profile">Update Profile</button>
                         </form>
+
 
                     </div>
                 </div>
@@ -283,6 +284,37 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
     <?php include "./footer.php"; ?>
 
     <script>
+        function validateLink(type) {
+            var input = document.getElementsByName(type)[0];
+            var value = input.value.trim();
+            var pattern;
+            var hint;
+
+            switch (type) {
+                case 'linkedin':
+                    pattern = /^(https?:\/\/)?(www\.)?linkedin\.com\/.*$/;
+                    hint = "Enter a valid LinkedIn profile URL.";
+                    break;
+                case 'twitter':
+                    pattern = /^(https?:\/\/)?(www\.)?twitter\.com\/.*$/;
+                    hint = "Enter a valid Twitter profile URL.";
+                    break;
+                case 'github':
+                    pattern = /^(https?:\/\/)?(www\.)?github\.com\/.*$/;
+                    hint = "Enter a valid GitHub profile URL.";
+                    break;
+                default:
+                    return;
+            }
+
+            if (value !== '' && !pattern.test(value)) {
+                // Display hint if the link is invalid
+                input.setCustomValidity(hint);
+            } else {
+                // Clear hint if the link is valid or empty
+                input.setCustomValidity('');
+            }
+        }
         // Automatically hide the success message after 5 seconds
         setTimeout(function() {
             document.querySelector('.success-message').style.display = 'none';

@@ -84,6 +84,16 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
         .error {
             color: red;
         }
+
+        .hidden-print {
+            display: none;
+        }
+
+        @media print {
+            .hidden-print {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -94,6 +104,7 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
     <section class="admin-content h-65">
         <div class="container">
             <h2>Manage Users</h2>
+            <button onclick="printUsers()">Print Users</button>
             <!-- Display error message if there is an issue fetching users -->
             <?php if ($error_message_users) : ?>
                 <p class="error"><?php echo $error_message_users; ?></p>
@@ -126,6 +137,7 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
                 <p class="error"><?php echo $error_message_admins; ?></p>
             <?php else : ?>
                 <h3>Admins</h3>
+                <button onclick="printAdmins()">Print Admins</button>
                 <table>
                     <tr>
                         <th>Admin ID</th>
@@ -149,6 +161,42 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
             <?php endif; ?>
         </div>
     </section>
+    <div class="hidden-print section">
+
+        <div id="print-users" class="print-section">
+            <h3>Users</h3>
+            <table>
+                <tr>
+                    <th>User ID</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                </tr>
+                <?php foreach ($users as $user) : ?>
+                    <tr>
+                        <td><?php echo $user['user_id']; ?></td>
+                        <td><?php echo $user['username']; ?></td>
+                        <td><?php echo $user['email']; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+
+        <div id="print-admins" class="print-section">
+            <h3>Admins</h3>
+            <table>
+                <tr>
+                    <th>Admin ID</th>
+                    <th>Username</th>
+                </tr>
+                <?php foreach ($admins as $admin) : ?>
+                    <tr>
+                        <td><?php echo $admin['admin_id']; ?></td>
+                        <td><?php echo $admin['username']; ?></td>
+                    </tr>
+                <?php endforeach; ?>
+            </table>
+        </div>
+    </div>
     <footer>
         <div class="container">
         </div>
@@ -158,6 +206,24 @@ if (isset($_POST['user_id']) && is_numeric($_POST['user_id'])) {
                 <p>&copy; <?php echo date("Y"); ?> Developer Events. All rights reserved.</p>
             </div>
         </footer>
+
+        <script>
+            function printUsers() {
+                var printContent = document.getElementById('print-users').innerHTML;
+                var originalContent = document.body.innerHTML;
+                document.body.innerHTML = printContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+            }
+
+            function printAdmins() {
+                var printContent = document.getElementById('print-admins').innerHTML;
+                var originalContent = document.body.innerHTML;
+                document.body.innerHTML = printContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+            }
+        </script>
 </body>
 
 </html>

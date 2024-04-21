@@ -198,9 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_event'])) {
                         <input type="text" name="event_name" placeholder="Event Name" required><br><br>
                         <textarea name="event_description" rows="7" placeholder="Event Description" required></textarea><br><br>
                         <label for="evet_from">From: </label>
-                        <input type="datetime-local" name="event_from" required><br><br> <!-- Start date -->
+                        <input type="datetime-local" name="event_from" min="<?php echo date('Y-m-d\TH:i'); ?>" required><br><br> <!-- Start date -->
                         <label for="evet_to">To: </label>
-                        <input type="datetime-local" name="event_to" required><br><br> <!-- End date -->
+                        <input type="datetime-local" name="event_to" min="<?php echo date('Y-m-d\TH:i'); ?>" required><br><br> <!-- End date -->
                         <input type="text" name="event_location" placeholder="Event Location" required><br><br>
                         <select name="category_id" required>
                             <option value="">Select Category</option>
