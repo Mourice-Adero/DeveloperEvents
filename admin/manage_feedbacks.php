@@ -18,10 +18,6 @@ $stmt = $db->query("
 ");
 $feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-if (!$feedbacks) {
-    $error_message = 'Failed to fetch feedbacks from the database.';
-}
-
 // Fetch event feedbacks with event names and user names
 $stmt = $db->prepare("
     SELECT ef.*, e.event_name, u.username
@@ -31,10 +27,6 @@ $stmt = $db->prepare("
 ");
 $stmt->execute();
 $event_feedbacks = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-if (!$event_feedbacks) {
-    $error_message = 'Failed to fetch event feedbacks from the database.';
-}
 
 // Fetch event names for filtering
 $event_names = array();
@@ -135,27 +127,31 @@ if (isset($_POST['delete_event_feedback'])) {
                 <h3>General Feedbacks (Messages)</h3>
                 <button onclick="printGeneralFeedbacks()">Print General Feedbacks</button>
                 <div class="printable-content" id="general-feedbacks">
-                    <table class="feedback-table">
-                        <tr>
-                            <th>User</th>
-                            <th>Date</th>
-                            <th>Feedback</th>
-                            <th>Action</th>
-                        </tr>
-                        <?php foreach ($feedbacks as $feedback) : ?>
+                    <?php if (!$feedbacks) : ?>
+                        <p>There are no feedbacks.</p>
+                    <?php else : ?>
+                        <table class="feedback-table">
                             <tr>
-                                <td><?php echo $feedback['username']; ?></td>
-                                <td><?php echo date('M d, Y', strtotime($feedback['feedback_date'])); ?></td>
-                                <td><?php echo $feedback['feedback_text']; ?></td>
-                                <td>
-                                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
-                                        <input type="hidden" name="feedback_id" value="<?php echo $feedback['feedback_id']; ?>">
-                                        <button type="submit" name="delete_feedback">Delete</button>
-                                    </form>
-                                </td>
+                                <th>User</th>
+                                <th>Date</th>
+                                <th>Feedback</th>
+                                <th>Action</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </table>
+                            <?php foreach ($feedbacks as $feedback) : ?>
+                                <tr>
+                                    <td><?php echo $feedback['username']; ?></td>
+                                    <td><?php echo date('M d, Y', strtotime($feedback['feedback_date'])); ?></td>
+                                    <td><?php echo $feedback['feedback_text']; ?></td>
+                                    <td>
+                                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
+                                            <input type="hidden" name="feedback_id" value="<?php echo $feedback['feedback_id']; ?>">
+                                            <button type="submit" name="delete_feedback">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php endif; ?>
                 </div>
 
                 <h3>Event Feedbacks</h3>
@@ -171,29 +167,33 @@ if (isset($_POST['delete_event_feedback'])) {
                 </form>
                 <button onclick="printEventFeedbacks()">Print Event Feedbacks</button>
                 <div class="printable-content" id="event-feedbacks">
-                    <table class="feedback-table">
-                        <tr>
-                            <th>Event Name</th>
-                            <th>User</th>
-                            <th>Date</th>
-                            <th>Feedback</th>
-                            <th>Action</th>
-                        </tr>
-                        <?php foreach ($filtered_feedbacks as $event_feedback) : ?>
+                    <?php if (!$filtered_feedbacks) : ?>
+                        <p>There are no event feedbacks.</p>
+                    <?php else : ?>
+                        <table class="feedback-table">
                             <tr>
-                                <td><?php echo $event_feedback['event_name']; ?></td>
-                                <td><?php echo $event_feedback['username']; ?></td>
-                                <td><?php echo date('M d, Y', strtotime($event_feedback['feedback_time'])); ?></td>
-                                <td><?php echo $event_feedback['feedback']; ?></td>
-                                <td>
-                                    <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
-                                        <input type="hidden" name="feedback_id" value="<?php echo $event_feedback['feedback_id']; ?>">
-                                        <button type="submit" name="delete_event_feedback">Delete</button>
-                                    </form>
-                                </td>
+                                <th>Event Name</th>
+                                <th>User</th>
+                                <th>Date</th>
+                                <th>Feedback</th>
+                                <th>Action</th>
                             </tr>
-                        <?php endforeach; ?>
-                    </table>
+                            <?php foreach ($filtered_feedbacks as $event_feedback) : ?>
+                                <tr>
+                                    <td><?php echo $event_feedback['event_name']; ?></td>
+                                    <td><?php echo $event_feedback['username']; ?></td>
+                                    <td><?php echo date('M d, Y', strtotime($event_feedback['feedback_time'])); ?></td>
+                                    <td><?php echo $event_feedback['feedback']; ?></td>
+                                    <td>
+                                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
+                                            <input type="hidden" name="feedback_id" value="<?php echo $event_feedback['feedback_id']; ?>">
+                                            <button type="submit" name="delete_event_feedback">Delete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </table>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

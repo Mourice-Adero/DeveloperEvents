@@ -19,13 +19,13 @@ $offset = ($page - 1) * $records_per_page;
 
 // Fetch total number of events
 $current_date = date('Y-m-d H:i:s');
-$stmt = $db->prepare("SELECT COUNT(*) FROM events WHERE event_from > :current_date");
+$stmt = $db->prepare("SELECT COUNT(*) FROM events WHERE event_from > :current_date OR event_to > :current_date");
 $stmt->bindParam(':current_date', $current_date);
 $stmt->execute();
 $total_events = $stmt->fetchColumn();
 
 // Fetch events from the database for the current page
-$stmt = $db->prepare("SELECT * FROM events WHERE event_from > :current_date ORDER BY event_from ASC LIMIT :offset, :records_per_page");
+$stmt = $db->prepare("SELECT * FROM events WHERE event_from > :current_date OR event_to > :current_date ORDER BY event_from ASC LIMIT :offset, :records_per_page");
 $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
 $stmt->bindParam(':records_per_page', $records_per_page, PDO::PARAM_INT);
 $stmt->bindParam(':current_date', $current_date);
