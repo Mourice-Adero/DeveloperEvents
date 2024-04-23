@@ -115,12 +115,130 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
             border-bottom: 2px solid #ffd700;
             padding-bottom: 5px;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 
 <body>
     <?php include "./header.php"; ?>
     <div class="profile-container h-65">
+        <!-- Section for displaying booked events -->
+        <section class="booked-events">
+            <div class="container">
+                <h2 class="titles">Booked Events</h2>
+                <?php echo $feedback_message; ?>
+                <?php echo $feedback_error_message; ?>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Event Date</th>
+                            <th>Action</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        // Fetch booked events for the current user
+                        $stmt = $db->prepare("SELECT e.*, b.cancellation_status, b.confirmation_status FROM events e INNER JOIN event_bookings b ON e.event_id = b.event_id WHERE b.user_id = :user_id");
+                        $stmt->bindParam(':user_id', $_SESSION['user_id']);
+                        $stmt->execute();
+                        $booked_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                        if ($booked_events) {
+                            // Display booked events
+                            foreach ($booked_events as $event) {
+                                echo "<tr>";
+                                echo "<td>{$event['event_name']}</td>";
+                                // Format the event date
+                                $event_date_from = date('M d, Y H:i', strtotime($event['event_from']));
+                                $event_date_to = date('M d, Y H:i', strtotime($event['event_to']));
+                                echo "<td>From: {$event_date_from} To: {$event_date_to}</td>";
+                                // Display cancellation or confirmation buttons based on booking status
+                                echo "<td>";
+                                if ($event['cancellation_status'] == 0) {
+                                    // Display cancel booking button if the booking has not been cancelled
+                                    echo "<form action='cancel_booking.php' method='POST' onsubmit='return confirm(\"Are you sure you want to cancel this booking?\")'>";
+                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
+                                    echo "<button type='submit' class='action-button'>Cancel Booking</button>";
+                                    echo "</form>";
+                                } else {
+                                    // Display booking cancelled message if the booking has been cancelled
+                                    echo "<button class='action-button' disabled>Booking Canceled</button>";
+                                }
+
+                                // Display confirm attendance button if the booking has not been confirmed and not cancelled
+                                if ($event['confirmation_status'] == 0 && $event['cancellation_status'] == 0) {
+                                    echo "<form action='confirm_attendance.php' method='POST' onsubmit='return confirm(\"Are you sure you want to confirm attendance?\")'>";
+                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
+                                    echo "<button type='submit' class='action-button'>Confirm Attendance</button>";
+                                    echo "</form>";
+                                } elseif ($event['confirmation_status'] == 1) {
+                                    // Display attendance confirmed message if the attendance has been confirmed
+                                    echo "<button class='action-button' disabled>Attendance Confirmed</button>";
+                                }
+                                echo "</td>";
+                                // Add feedback form if the event has started
+                                if (strtotime($event['event_from']) <= time()) {
+                                    echo "<td>";
+                                    echo "<form action='submit_feedback.php' method='POST'>";
+                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
+                                    echo "<textarea name='feedback' placeholder='Provide your feedback'></textarea>";
+                                    echo "<button type='submit'>Submit Feedback</button>";
+                                    echo "</form>";
+                                    echo "</td>";
+                                } else {
+                                    echo "<td>Event hasn't started yet</td>";
+                                }
+                                echo "</tr>";
+                            }
+                        } else {
+                            // No booked events
+                            echo "<tr><td colspan='4'>No events booked yet.</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="user-profile">
             <div class="container profile-container">
                 <div>
@@ -159,13 +277,7 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
                         echo "<img class='profile-picture' src='../assets/images/profile/" . (!empty($user['profile_picture']) ? $user['profile_picture'] : 'avatar.png') . "' alt='Profile Picture'>";
                         echo "<p>Username: " . $user['username'] . "</p>";
                         echo "<p>Email: " . $user['email'] . "</p>";
-                        // Add more user details fields as needed
-                        echo "<p>Phone Number: " . $user['phone_number'] . "</p>";
                         echo "<p>Visibility: " . ($user['visibility'] ? 'Enabled' : 'Disabled') . "</p>";
-                        echo "<p>Profession: " . $user['profession'] . "</p>";
-                        echo "<p>LinkedIn: " . $user['linkedin'] . "</p>";
-                        echo "<p>Twitter: " . $user['twitter'] . "</p>";
-                        echo "<p>GitHub: " . $user['github'] . "</p>";
                     }
                     ?>
                 </div>
@@ -176,110 +288,46 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
                             <?php echo $message; ?>
                         </div>
                     <?php endif; ?>
-                    <div class="profile-form-container">
-                        <h3 class="titles">Update Profile</h3>
-                        <!-- Form to update user details -->
-                        <form action="update_profile.php" method="POST" class="profile-form" enctype="multipart/form-data" id="profile-form">
-                            <input type="file" name="profile_picture">
-                            <input type="text" name="username" placeholder="Username" value="<?php echo isset($user['username']) ? $user['username'] : ''; ?>" required>
-                            <input type="email" name="email" placeholder="Email" value="<?php echo isset($user['email']) ? $user['email'] : ''; ?>" required>
-                            <input type="password" name="current_password" placeholder="Current Password" required>
-                            <input type="password" name="new_password" placeholder="New Password">
-                            <input type="password" name="confirm_password" placeholder="Confirm Password">
-                            <input type="text" name="phone_number" placeholder="Phone Number" value="<?php echo isset($user['phone_number']) ? $user['phone_number'] : ''; ?>">
-                            <label for="visibility">Visibility</label>
-                            <select name="visibility">
-                                <option value="0" <?php echo ($user['visibility'] == 0) ? 'selected' : ''; ?>>Disabled</option>
-                                <option value="1" <?php echo ($user['visibility'] == 1) ? 'selected' : ''; ?>>Enabled</option>
-                            </select>
-                            <input type="text" name="profession" placeholder="Profession" value="<?php echo isset($user['profession']) ? $user['profession'] : ''; ?>">
-                            <input type="text" name="linkedin" placeholder="LinkedIn" value="<?php echo isset($user['linkedin']) ? $user['linkedin'] : ''; ?>" onblur="validateLink('linkedin')">
-                            <input type="text" name="twitter" placeholder="Twitter" value="<?php echo isset($user['twitter']) ? $user['twitter'] : ''; ?>" onblur="validateLink('twitter')">
-                            <input type="text" name="github" placeholder="GitHub" value="<?php echo isset($user['github']) ? $user['github'] : ''; ?>" onblur="validateLink('github')">
-                            <button type="submit" name="update_profile">Update Profile</button>
-                        </form>
+                    <!-- Button to trigger the modal -->
+                    <button class="action-button" id="openModal">Update Profile</button>
+                </div>
 
-
+                <!-- Modal container -->
+                <div id="myModal" class="modal">
+                    <div class="modal-content">
+                        <!-- Close button -->
+                        <span class="close">&times;</span>
+                        <div class="profile-form-container">
+                            <h3 class="titles">Update Profile</h3>
+                            <!-- Form to update user details -->
+                            <form action="update_profile.php" method="POST" class="profile-form" enctype="multipart/form-data" id="profile-form">
+                                <input type="file" name="profile_picture">
+                                <input type="text" name="username" placeholder="Username" value="<?php echo isset($user['username']) ? $user['username'] : ''; ?>" required>
+                                <input type="email" name="email" placeholder="Email" value="<?php echo isset($user['email']) ? $user['email'] : ''; ?>" required>
+                                <input type="password" name="current_password" placeholder="Current Password" required>
+                                <input type="password" name="new_password" placeholder="New Password">
+                                <input type="password" name="confirm_password" placeholder="Confirm Password">
+                                <input type="text" name="phone_number" placeholder="Phone Number" value="<?php echo isset($user['phone_number']) ? $user['phone_number'] : ''; ?>">
+                                <label for="visibility">Visibility</label>
+                                <select name="visibility">
+                                    <option value="0" <?php echo ($user['visibility'] == 0) ? 'selected' : ''; ?>>Disabled</option>
+                                    <option value="1" <?php echo ($user['visibility'] == 1) ? 'selected' : ''; ?>>Enabled</option>
+                                </select>
+                                <input type="text" name="profession" placeholder="Profession" value="<?php echo isset($user['profession']) ? $user['profession'] : ''; ?>">
+                                <input type="text" name="linkedin" placeholder="LinkedIn" value="<?php echo isset($user['linkedin']) ? $user['linkedin'] : ''; ?>" onblur="validateLink('linkedin')">
+                                <input type="text" name="twitter" placeholder="Twitter" value="<?php echo isset($user['twitter']) ? $user['twitter'] : ''; ?>" onblur="validateLink('twitter')">
+                                <input type="text" name="github" placeholder="GitHub" value="<?php echo isset($user['github']) ? $user['github'] : ''; ?>" onblur="validateLink('github')">
+                                <button type="submit" name="update_profile">Update Profile</button>
+                            </form>
+                        </div>
                     </div>
+
+
+
+
                 </div>
             </div>
         </section>
-
-        <!-- Section for displaying booked events -->
-        <section class="booked-events">
-            <div class="container">
-                <h2 class="titles">Booked Events</h2>
-                <?php echo $feedback_message; ?>
-                <?php echo $feedback_error_message; ?>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Event Name</th>
-                            <th>Event Date</th>
-                            <th>Action</th>
-                            <th>Feedback</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php
-                        // Fetch booked events for the current user
-                        $stmt = $db->prepare("SELECT e.*, b.cancellation_status, b.confirmation_status FROM events e INNER JOIN event_bookings b ON e.event_id = b.event_id WHERE b.user_id = :user_id");
-                        $stmt->bindParam(':user_id', $_SESSION['user_id']);
-                        $stmt->execute();
-                        $booked_events = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-                        if ($booked_events) {
-                            // Display booked events
-                            foreach ($booked_events as $event) {
-                                echo "<tr>";
-                                echo "<td>{$event['event_name']}</td>";
-                                // Format the event date
-                                $event_date_from = date('M d, Y H:i', strtotime($event['event_from']));
-                                $event_date_to = date('M d, Y H:i', strtotime($event['event_to']));
-                                echo "<td>From: {$event_date_from} To: {$event_date_to}</td>";
-                                // Display cancellation or confirmation buttons based on booking status
-                                echo "<td>";
-                                if ($event['cancellation_status'] == 0 && strtotime($event['event_from']) > time()) {
-                                    echo "<form action='cancel_booking.php' method='POST' onsubmit='return confirm(\"Are you sure you want to cancel this booking?\")'>";
-                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
-                                    echo "<button type='submit' class='action-button'>Cancel Booking</button>";
-                                    echo "</form>";
-                                } else {
-                                    echo "<button class='action-button' disabled>Booking Canceled</button>";
-                                }
-                                if ($event['confirmation_status'] == 0 && strtotime($event['event_from']) - 43200 > time() && $event['cancellation_status'] == 0) {
-                                    echo "<form action='confirm_attendance.php' method='POST' onsubmit='return confirm(\"Are you sure you want to confirm attendance?\")'>";
-                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
-                                    echo "<button type='submit' class='action-button'>Confirm Attendance</button>";
-                                    echo "</form>";
-                                } else {
-                                    echo "<button class='action-button' disabled>Attendance Confirmed</button>";
-                                }
-                                echo "</td>";
-                                // Add feedback form if the event has started
-                                if (strtotime($event['event_from']) <= time()) {
-                                    echo "<td>";
-                                    echo "<form action='submit_feedback.php' method='POST'>";
-                                    echo "<input type='hidden' name='event_id' value='{$event['event_id']}'>";
-                                    echo "<textarea name='feedback' placeholder='Provide your feedback'></textarea>";
-                                    echo "<button type='submit'>Submit Feedback</button>";
-                                    echo "</form>";
-                                    echo "</td>";
-                                } else {
-                                    echo "<td>Event hasn't started yet</td>";
-                                }
-                                echo "</tr>";
-                            }
-                        } else {
-                            // No booked events
-                            echo "<tr><td colspan='4'>No events booked yet.</td></tr>";
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
     </div>
     <?php include "./footer.php"; ?>
 
@@ -319,6 +367,32 @@ if (isset($_SESSION['feedback_errors']) && !empty($_SESSION['feedback_errors']))
         setTimeout(function() {
             document.querySelector('.success-message').style.display = 'none';
         }, 5000);
+
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("openModal");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function() {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
     </script>
 
 </body>

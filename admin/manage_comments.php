@@ -8,7 +8,18 @@ if (!isset($_SESSION['admin_id'])) {
 
 require_once '../includes/db.php';
 
-$stmt = $db->query("SELECT * FROM comments");
+$stmt = $db->query("
+    SELECT 
+        c.comment_id, 
+        c.comment, 
+        e.event_name, 
+        u.username 
+    FROM 
+        comments c 
+    INNER JOIN 
+        events e ON c.event_id = e.event_id 
+    INNER JOIN 
+        users u ON c.user_id = u.user_id");
 $comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment'])) {
@@ -56,17 +67,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment'])) {
             <?php if (isset($error_message)) : ?>
                 <p class="error"><?php echo $error_message; ?></p>
             <?php endif; ?>
-            <ul>
+            <table>
+                <tr>
+                    <th>Comment</th>
+                    <th>Event</th>
+                    <th>User</th>
+                    <th>Action</th>
+                </tr>
                 <?php foreach ($comments as $comment) : ?>
-                    <li>
-                        <?php echo $comment['comment']; ?>
-                        <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
-                            <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
-                            <button type="submit" name="delete_comment">Delete</button>
-                        </form>
-                    </li>
+                    <tr>
+                        <td><?php echo $comment['comment']; ?></td>
+                        <td><?php echo $comment['event_name']; ?></td>
+                        <td><?php echo $comment['username']; ?></td>
+                        <td>
+                            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" method="POST">
+                                <input type="hidden" name="comment_id" value="<?php echo $comment['comment_id']; ?>">
+                                <button type="submit" name="delete_comment">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
                 <?php endforeach; ?>
-            </ul>
+            </table>
         </div>
     </section>
     <footer>

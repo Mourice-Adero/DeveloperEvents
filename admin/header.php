@@ -57,6 +57,7 @@
                 <li><a href="manage_bookings.php">Booked-Events</a></li>
                 <li><a href="manage_categories.php">Categories</a></li>
                 <li><a href="manage_feedbacks.php">Feedbacks</a></li>
+                <li><a href="manage_comments.php">Comments</a></li>
                 <li><a href="support.php">Support</a></li>
                 <li><a href="#" onclick="confirmLogout()">Logout</a></li>
             </ul>

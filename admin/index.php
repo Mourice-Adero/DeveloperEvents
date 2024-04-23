@@ -22,6 +22,9 @@ $total_users = $stmt->fetchColumn();
 
 $stmt = $db->query("SELECT COUNT(*) FROM event_bookings");
 $total_booked_events = $stmt->fetchColumn();
+
+$stmt = $db->query("SELECT COUNT(*) FROM comments");
+$total_event_comments = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -87,6 +90,11 @@ $total_booked_events = $stmt->fetchColumn();
                     <h3>Feedbacks/Messages</h3>
                     <p class="item-number"><?php echo $total_feedbacks; ?></p>
                     <a href="manage_feedbacks.php">View Feedbacks</a>
+                </div>
+                <div class="card">
+                    <h3>Event Comments</h3>
+                    <p class="item-number"><?php echo $total_event_comments; ?></p>
+                    <a href="manage_comments.php">View Comments</a>
                 </div>
             </div>
         </div>

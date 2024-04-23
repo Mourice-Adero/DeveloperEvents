@@ -65,6 +65,15 @@ $message = '';
             border-radius: 4px;
         }
 
+        .messageM {
+            background-color: #dff0d8;
+            color: #3c763d;
+            border: 1px solid #d6e9c6;
+            padding: 10px;
+            margin: 20px;
+            border-radius: 4px;
+        }
+
         .comment-list {
             max-height: 200px;
             /* Set a maximum height for the comments section */
@@ -96,9 +105,7 @@ $message = '';
 </head>
 
 <body>
-    <?php
-    include "./header.php";
-    ?>
+    <?php include "./header.php"; ?>
     <section class="single-event">
         <div class="container event-container">
             <div>
@@ -115,35 +122,86 @@ $message = '';
                 <?php endif; ?>
             </div>
 
-            <!-- Booking form -->
+            <!-- Booking status or form -->
             <div id="book-event">
                 <?php
-                if (isset($_GET['message'])) {
-                    $message = $_GET['message'];
-                    echo "<p class='message'>" . $message . "</p>";
-                }
+                // Check if the event is booked by any user
+                $stmt = $db->prepare("SELECT COUNT(*) AS count FROM event_bookings WHERE event_id = :event_id");
+                $stmt->bindParam(':event_id', $event_id);
+                $stmt->execute();
+                $count = $stmt->fetch(PDO::FETCH_ASSOC);
+                $is_event_booked = $count['count'] > 0;
+
+                // Check if the user has booked the event
+                $user_id = $_SESSION['user_id'];
+                $stmt = $db->prepare("SELECT * FROM event_bookings WHERE event_id = :event_id AND user_id = :user_id");
+                $stmt->bindParam(':event_id', $event_id);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->execute();
+                $booking_status = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($booking_status) {
+                    // Display booking status
+                    if ($booking_status['confirmation_status'] == 1) {
+                        echo "<p class='message'>You have confirmed your attendance for this event.</p>";
+                        echo "<p class='messageM'>You have confirmed your attendance for this event.</p>";
+                    } elseif ($booking_status['cancellation_status'] == 1) {
+                        // If the event was canceled, show the form to book again
+                        echo "<p class='message'>You have cancelled your attendance for this event.</p>";
+                        echo "<p class='messageM'>You have cancelled your attendance for this event.</p>";
                 ?>
-                <h2 style="margin-top: 10px;">Register For Event</h2>
-                <form action="book_event.php" method="POST" onsubmit="return confirm('Are you sure you want to register for this event?')">
-                    <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
-                    <label for="username">Username:</label>
-                    <input type="text" id="username" name="username" value="<?php echo $_SESSION['username']; ?>" readonly required><br><br>
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required><br><br>
-                    <label for="current_location">Current Location/Institution:</label>
-                    <input type="text" id="current_location" name="current_location" required><br><br>
-                    <label for="phone_number">Phone Number:</label>
+                        <h2 style="margin-top: 10px;">Book Again</h2>
+                        <form action="book_event.php" method="POST" onsubmit="return confirm('Are you sure you want to book again for this event?')">
+                            <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" name="username" value="<?php echo $_SESSION['username']; ?>" readonly required><br><br>
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required><br><br>
+                            <label for="current_location">Current Location/Institution:</label>
+                            <input type="text" id="current_location" name="current_location" required><br><br>
+                            <label for="phone_number">Phone Number:</label>
+                            <?php
+                            $stmt = $db->prepare("SELECT phone_number FROM users WHERE user_id = :user_id");
+                            $stmt->bindParam(':user_id', $user_id);
+                            $stmt->execute();
+                            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                            $phone_number = $user['phone_number'];
+                            ?>
+                            <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required><br><br>
+                            <button type="submit">Book Again</button>
+                        </form>
                     <?php
-                    $user_id = $_SESSION['user_id'];
-                    $stmt = $db->prepare("SELECT phone_number FROM users WHERE user_id = :user_id");
-                    $stmt->bindParam(':user_id', $user_id);
-                    $stmt->execute();
-                    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $phone_number = $user['phone_number'];
+                    } else {
+                        echo "<p class='message'>Your booking for this event is pending confirmation.</p>";
+                        echo "<p class='messageM'>Your booking for this event is pending confirmation.</p>";
+                    }
+                } elseif ($is_event_booked) {
+                    // Display message if the event is already booked by other users
+                    echo "<p class='message'>This event is already fully booked.</p>";
+                } else {
+                    // Display booking form
                     ?>
-                    <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required><br><br>
-                    <button type="submit">Book Event</button>
-                </form>
+                    <h2 style="margin-top: 10px;">Register For Event</h2>
+                    <form action="book_event.php" method="POST" onsubmit="return confirm('Are you sure you want to register for this event?')">
+                        <input type="hidden" name="event_id" value="<?php echo $event_id; ?>">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" value="<?php echo $_SESSION['username']; ?>" readonly required><br><br>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" value="<?php echo $_SESSION['email']; ?>" readonly required><br><br>
+                        <label for="current_location">Current Location/Institution:</label>
+                        <input type="text" id="current_location" name="current_location" required><br><br>
+                        <label for="phone_number">Phone Number:</label>
+                        <?php
+                        $stmt = $db->prepare("SELECT phone_number FROM users WHERE user_id = :user_id");
+                        $stmt->bindParam(':user_id', $user_id);
+                        $stmt->execute();
+                        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                        $phone_number = $user['phone_number'];
+                        ?>
+                        <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($phone_number); ?>" required><br><br>
+                        <button type="submit">Book Event</button>
+                    </form>
+                <?php } ?>
             </div>
 
         </div>
